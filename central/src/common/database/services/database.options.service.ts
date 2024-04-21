@@ -41,9 +41,7 @@ export class DatabaseOptionsService implements IDatabaseOptionsService {
                 username: user,
                 password: password,
             };
-        }
-        console.log("ghrUri: ", uri);
-        
+        }        
 
         return mongooseOptions;
     }

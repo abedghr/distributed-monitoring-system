@@ -15,7 +15,6 @@ export class HelperDateTimeService implements IHelperDateTimeService {
         // Convert date strings to Date objects
         const timestampFrom: number = new Date(dateTimeFrom).getTime();
         const timestampTo: number = new Date(dateTimeTo).getTime();
-console.log(dateTimeFrom, dateTimeTo, timestampFrom, timestampTo);
 
         // Calculate the difference between from and to
         const timeDifference = timestampTo - timestampFrom;
