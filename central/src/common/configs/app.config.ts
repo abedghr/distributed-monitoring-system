@@ -3,7 +3,7 @@ import { registerAs } from '@nestjs/config';
 export default registerAs(
     'app',
     (): Record<string, any> => ({
-        name: process.env.APP_NAME ?? 'ovo',
+        name: process.env.APP_NAME ?? 'monitoring-system',
         env: process.env.APP_ENV ?? 'development',
         globalPrefix: '/api',
         http: {
