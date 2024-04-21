@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  central:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: central_server
+    expose:
+      - ${HTTP_PORT}
+    ports:
+      - "${HTTP_PORT}:${HTTP_PORT}"
+    networks:
+      - central-network
+    env_file:
+      - .env
+    depends_on:
+      - central_redis
+      - central_mongo1
+      - central_mongo2
+      - central_mongo3
+    restart: unless-stopped
+
+  central_redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - central-network
+    restart: unless-stopped
+
+  central_mongo1:
+    image: mongo
+    hostname: central_mongo1
+    container_name: central_mongo1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - 27017:27017
+    networks:
+      - central-network
+    volumes:
+      - dbdata1:/data/db
+    entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,central_mongo1"]
+    restart: unless-stopped
+
+  central_mongo2:
+    image: mongo
+    hostname: central_mongo2
+    container_name: central_mongo2
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - 27018:27017
+    networks:
+      - central-network
+    volumes:
+      - dbdata2:/data/db
+    entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,central_mongo2"]
+    restart: unless-stopped
+
+  central_mongo3:
+    image: mongo
+    hostname: central_mongo3
+    container_name: central_mongo3
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - 27019:27017
+    networks:
+      - central-network
+    volumes:
+      - dbdata3:/data/db
+    entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,central_mongo3"]
+    restart: unless-stopped
+
+  central_mongosetup:
+    image: mongo
+    networks:
+      - central-network
+    depends_on:
+      - central_mongo1
+      - central_mongo2
+      - central_mongo3
+    volumes:
+      - .:/scripts
+    restart: "no"
+    entrypoint: [ "bash", "/scripts/mongo_setup.sh"]
+
+volumes:
+  dbdata1:
+  dbdata2:
+  dbdata3: 
+networks:
+  central-network:
+    external: true
+    

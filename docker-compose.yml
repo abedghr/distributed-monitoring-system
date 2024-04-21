@@ -1,0 +1,128 @@
+version: '3.8'
+
+services:
+  central:
+    build:
+      context: ./central
+      dockerfile: Dockerfile
+    image: central_server:latest
+    expose:
+      - ${HTTP_PORT}
+    ports:
+      - "${HTTP_PORT}:${HTTP_PORT}"
+    networks:
+      - monitoring-system-network
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - mongo1
+      - mongo2
+      - mongo3
+    restart: unless-stopped
+
+  agent1:
+    build:
+      context: ./agent
+      dockerfile: Dockerfile
+    image: agent_node:latest
+    networks:
+      - monitoring-system-network
+    depends_on:
+      - central
+    env_file:
+      - ./agent/.env-docker
+    environment:
+      - NODE_IDENTIFIER=agent1
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  agent2:
+    build:
+      context: ./agent
+      dockerfile: Dockerfile
+    image: agent_node:latest
+    networks:
+      - monitoring-system-network
+    depends_on:
+      - central
+    env_file:
+      - ./agent/.env-docker
+    environment:
+      - NODE_IDENTIFIER=agent2
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - monitoring-system-network
+    restart: unless-stopped
+
+  mongo1:
+    image: mongo
+    hostname: mongo1
+    container_name: mongo1
+    ports:
+      - 27017:27017
+    networks:
+      - monitoring-system-network
+    volumes:
+      - mongodbdata1:/data/db
+    entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,mongo1"]
+    restart: unless-stopped
+  mongo2:
+    image: mongo
+    hostname: mongo2
+    container_name: mongo2
+    ports:
+      - 27018:27017
+    networks:
+      - monitoring-system-network
+    volumes:
+      - mongodbdata2:/data/db
+    entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,mongo2"]
+    restart: unless-stopped
+  mongo3:
+    image: mongo
+    hostname: mongo3
+    container_name: mongo3
+    ports:
+      - 27019:27017
+    networks:
+      - monitoring-system-network
+    volumes:
+      - mongodbdata3:/data/db
+    entrypoint: ["mongod", "--replSet", "myReplicaSet", "--bind_ip", "localhost,mongo3"]
+    restart: unless-stopped
+  mongosetup:
+    image: mongo
+    networks:
+      - monitoring-system-network
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    volumes:
+      - .:/scripts
+    restart: "no"
+    entrypoint: [ "bash", "/scripts/mongo_setup.sh"]
+
+volumes:
+  mongodbdata1:
+  mongodbdata2:
+  mongodbdata3:
+
+networks:
+  monitoring-system-network:
+    external: true

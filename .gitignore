@@ -1,0 +1,31 @@
+# central
+central/dist
+central/node_modules
+central/.env
+central/.env-docker
+.env
+
+# agent
+agent/dist
+agent/node_modules
+agent/.env
+agent/.env-docker
+
+# OS
+.DS_Store
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
