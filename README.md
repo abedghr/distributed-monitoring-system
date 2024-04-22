@@ -78,6 +78,10 @@ In this monitoring system setup, we've implemented several performance optimizat
 
 - **MongoDB Replica Set**: The monitoring system utilizes a MongoDB cluster with three nodes, including one primary and two secondary nodes. By reading data from secondary nodes, we enhance performance and distribute the load across the cluster.
 
+- **MongoDB Index Optimization**: implemented indexes to enhance the performance of querying.
+   - `node-timestamp-ndx`: Used for [GET] "/api/cpu-metric" API.
+   - `timestamp-ndx`: Used for [GET] "/api/nodes-list" API.
+
 - **Redis Caching and Queueing**: Redis is employed for caching and queuing purposes. Instead of inserting data into the database every 5 seconds, we leverage Redis to cache the data and insert it into MongoDB as a bulk operation every 30 seconds. This approach minimizes the number of insert queries and enhances system efficiency.
 
 - **Additional Note**:
