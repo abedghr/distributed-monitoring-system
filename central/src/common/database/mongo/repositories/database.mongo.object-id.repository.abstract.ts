@@ -166,7 +166,7 @@ export abstract class DatabaseMongoObjectIdRepositoryAbstract<
         field: string,
         options?:  IDatabaseFindOneOptions<ClientSession>
     ): Promise<Array<string>> {
-        const distinct = this._repository.distinct(field).read('secondary');
+        const distinct = this._repository.distinct(field);
         if (options?.readFromSecondary) {
             distinct.read('secondary');
         }
